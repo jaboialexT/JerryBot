@@ -11,15 +11,33 @@
     { "input":"hello everyone", "output":1 },
     { "input":"howdy everyone", "output":1 },
     { "input":"hi jerry", "output":1 },
+    { "input":"hi jerry", "output":1 },
     { "input":"hello jerry", "output":1 },
     { "input":"jerry", "output":1 },
+    { "input":"jerry", "output":1 },
+    { "input":"waz goin on", "output":1 },
+    { "input":"what it do jerry", "output":1 }, 
+    { "input":"whats good", "output":1 }, 
+    { "input":"heyo", "output":1 }, 
+    { "input":"yo jerry", "output":1 }, 
     
     { "input":"bye", "output":2 },
     { "input":"cya", "output":2 },
     { "input":"good bye", "output":2 },
     { "input":"goodbye", "output":2 },
+    { "input":"goodbye", "output":2 },
+    { "input":"goodbye jerry", "output":2 },
     { "input":"gnight", "output":2 },
     { "input":"good night", "output":2 },
+    { "input":"goodnight", "output":2 },
+    { "input":"goodnight", "output":2 },
+    { "input":"goodnight", "output":2 },
+    { "input":"goodnight jerry", "output":2 },
+    { "input":"goodnight jerry", "output":2 },
+    { "input":"goodnight jerry", "output":2 },
+    { "input":"goodnight jerry", "output":2 },
+    { "input":"goodnight buddy", "output":2 },
+    { "input":"goodnight buddy", "output":2 },
     { "input":"see you", "output":2 },
     { "input":"see you later", "output":2 },
     { "input":"see you tomorrow", "output":2 },
@@ -71,6 +89,13 @@
     { "input":"what is your opinion on", "output":5 },
     { "input":"do you like", "output":5 },
     { "input":"do you hate", "output":5 },
+    { "input":"opinions on", "output":5 },
+    { "input":"what are your opinions on", "output":5 },
+    { "input":"what is your opinion on", "output":5 },
+    { "input":"do you like", "output":5 },
+    { "input":"do you like joaquim", "output":5 },
+    { "input":"do you hate", "output":5 },
+    { "input":"opinions on", "output":5 },
     
     
     { "input":"how are you", "output":6 },
@@ -94,6 +119,24 @@
     { "input":"good afternoon", "output":6 },
     { "input":"good evening", "output":6 },
     { "input":"welcome", "output":6 },
-    { "input":"good to see you", "output":6 }
+    { "input":"good to see you", "output":6 },
+    
+    
+   
+    { "input":"give me some brain", "output":7 }, 
+    { "input":"suck my nard", "output":7 },
+    { "input":"fuck you", "output":7 },
+    { "input":"suck my dick", "output":7 },
+    { "input":"i hate you", "output":7 },
+    { "input":"i dont like you", "output":7 },
+    { "input":"why we got beef", "output":7 },
+    { "input":"give me some brain", "output":7 }, 
+    { "input":"suck my nard", "output":7 },
+    { "input":"fuck you", "output":7 },
+    { "input":"suck my dick", "output":7 },
+    { "input":"i hate you", "output":7 },
+    { "input":"i dont like you", "output":7 },
+    { "input":"why we got beef", "output":7 }
+    
 ]
     

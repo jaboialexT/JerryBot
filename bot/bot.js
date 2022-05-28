@@ -30,11 +30,12 @@ client.on("message",msg=>{
 
 client.login(token)
 
-var hello_reply =["hi","sup","yo","hello"];
+var hello_reply =["hi","sup","yo","hello","wassup"];
 var bye_reply = ["bye","peace","see ya","goodbye"]
-var yes_reply =["yes","i agree"]
+var yes_reply =["im glad you feel that way!","i feel that way too!","if you feel that way then i do too!"]
 var no_reply=["no","i dont agree"]
 var opinion_reply=["i hate them","i love them","theyre mid"]
+var negative_reply=["fuck you","you a bitch"]
 
 const reply = (intent) =>{
     if(intent ==="") return ":thinking";
@@ -60,6 +61,9 @@ const reply = (intent) =>{
                         case 6:
                             retstr = greeting();
                             break;
+            case 7:
+                retstr = negative_reply[Math.floor(Math.random()*negative_reply.length)]
+                break;
                             default:
                                 retstr =":thinking";
             break;
