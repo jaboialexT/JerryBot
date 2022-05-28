@@ -1,0 +1,24 @@
+{
+  "name": "jerrybot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaboialexT/JerryBot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaboialexT/JerryBot/issues"
+  },
+  "homepage": "https://github.com/jaboialexT/JerryBot#readme",
+  "dependencies": {
+    "brain.js": "^2.0.0-beta.15",
+    "discord.js": "^13.7.0"
+  }
+}
