@@ -35,7 +35,7 @@ client.on("message",msg=>{
         return;
     }
     if(msg.content =="") return
-    if(!msg.author.bot /*&& msg.channel.id ===channelID*/){
+    if(!msg.author.bot && msg.channel.id ===channelID){
         var words = msg.content;
 
         var sentence = words.replace(/[^a-zA-Z]+/g,"").toLowerCase();
