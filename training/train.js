@@ -14,7 +14,7 @@ const r1 = readline.createInterface({
 })
 
 var botIntent;
-var trainingData = [];
+
 
 function ensureDirectoryExistence(filePath){
     var dirname = path.dirname(filePath);
@@ -24,9 +24,19 @@ function ensureDirectoryExistence(filePath){
     ensureDirectoryExistence(dirname);
     fs.mkdirSync(dirname)
 }
+function dataShuffle(array){
+    var currentIndex = array.length, temporaryValue,randomIndex;
+    while(0!=currentIndex){
+        randomIndex = Math.floor(Math.random()*currentIndex);
+        currentIndex -=1;
+        temporaryValue = array[randomIndex]
+        array[randomIndex] = temporaryValue
+    }
+    return array;
+}
 
 function loadInitialTraining(){
-    train(JSON.parse(fs.readFileSync('conversation-data.json')))
+    train(dataShuffle(JSON.parse(fs.readFileSync('conversation-data.json'))))
 }
 
 function loadTraining(){
@@ -175,8 +185,8 @@ const reply = (intent) =>{
                 return str;
             }
 const init = () =>{
-    //loadInitialTraining();
+    loadInitialTraining();//initial training
     //loadTraining(); //for retraining a bot
-    testTrainingModel() //testing bot
+    //testTrainingModel() //testing bot
 }
 init();
