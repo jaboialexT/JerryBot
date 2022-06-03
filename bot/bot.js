@@ -110,15 +110,15 @@ function update() {
     status.timeAlive++;
     status.timeLastFed++;
     status.timeLastPlayed++;
-    if(hunger==10 && happiness ==10 && health!=10) health++;
-    hunger--;
-    happiness--;
-    if(!hunger>5) happiness--;
-    if(hunger<=0){
-        hunger = 0;
-        health--;
+    if(status.hunger==10 && status.happiness ==10 && status.health!=10) status.health++;
+    status.hunger--;
+    status.happiness--;
+    if(!status.hunger>5) status.happiness--;
+    if(status.hunger<=0){
+        status.hunger = 0;
+        status.health--;
     }   
-    if(health==0) {
+    if(status.health==0) {
         status.generation++;
         start();
     }

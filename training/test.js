@@ -38,13 +38,7 @@ const boot = () =>{
         var trainingData = "\t{ \"input\":\""+trainingDataMessage[i]+"\", \"output\":"+trainingDataIntent[i]+" },\r"
         //if the intent of the database does not match the neural networks given intent then rewrite the data point into the database
         if(trainingDataIntent[i]!=parseInt(network.run(qs))){
-            try{
-                fs.appendFile("conversation-data.json",trainingData,(err,result)=>{
-                    if(err) console.log("Error: "+err)
-                })
-            }catch(err){
-                console.log(err)
-            }
+               
         }
     }
 }
