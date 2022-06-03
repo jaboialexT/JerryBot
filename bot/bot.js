@@ -8,7 +8,6 @@ const network = new brain.recurrent.LSTM({
     activation: 'leaky-relu'
 });
 
-var botIntent;
 var token = config.token;
 const channelID = config.channel;
 const prefix = config.prefix;
@@ -85,7 +84,6 @@ const reply = (intent) =>{
                                 retstr =":thinking:";
             break;
         }
-        botIntent = network.run(retstr);
         return retstr;
     }
 
