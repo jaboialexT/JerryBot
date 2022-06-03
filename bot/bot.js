@@ -6,6 +6,7 @@ const save = require('./saveData.json')
 const fs = require('fs');
 const brain = require('brain.js');
 const { DiscordAPIError } = require('discord.js');
+const { execPath } = require('process')
 const network = new brain.recurrent.LSTM({
     activation: 'leaky-relu'
 });
@@ -60,8 +61,8 @@ function saveStatusData()
         +",\n\"timeLastFed\":"+status.timeLastFed
         +",\n\"timeLastPlayed\":"+status.timeLastPlayed
         +",\n\"personLastFed\":\""+status.personLastFed
-        +",\n\"personLastPlayed\":\""+status.personLastPlayed
-        +",\n\"generation\":"+status.generation+"\"\n}"
+        +"\",\n\"personLastPlayed\":\""+status.personLastPlayed
+        +"\",\n\"generation\":"+status.generation+"\n}"
         ,(err,result)=>{
             if(err) console.log("Error: "+err);
         });
@@ -74,7 +75,7 @@ function start(){
     //send dead jerry to graveyard 
     if(status.generation>1){
         try{
-            fs.appendFile("graveyard.txt","Jerry "+romanize(status.generation)+" lived for "+status.timeAlive+" hours\n",(err,result)=>{
+            fs.appendFile("graveyard.json","Jerry "+romanize(status.generation)+" lived for "+status.timeAlive+" hours\n",(err,result)=>{
                 if(err) console.log("Error: "+err)
             })
         }catch(err){
@@ -120,21 +121,21 @@ function update() {
         status.generation++;
         start();
     }
+    saveStatusData();
 }
 client.on("ready",()=>{
     network.fromJSON(JSON.parse(fs.readFileSync('neuralnet.json','utf8')))
     console.log(`logged in as ${client.user.tag}!`)
     client.channels.fetch(channelID).then(channel => {
-        channel.send(":smiley_cat: ");
-        channel.send("good morning! i am up! feel free to talk to me");
+        channel.send(":smiley_cat:\ngood morning! i am up! feel free to talk to me");
     });
 })
 
 client.on("message",msg=>{
     if(msg.content=="!sleep"&&msg.channel.id==="979130836857258007"){
         client.channels.fetch(channelID).then(channel => {
-            channel.send(":yawning_face:");
-            channel.send("yawnnnnn time for me to sleep");
+            channel.send(":yawning_face:\nyawnnnnn time for me to sleep");
+            saveStatusData();
             setTimeout(function(){
                 process.exit();
             },2000)
@@ -173,6 +174,17 @@ client.on("message",msg=>{
         }
         client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
         saveStatusData();
+    }
+    if(command == "help"){
+        msg.channel.send("!status to check up on how jerrys doing\n!feed to feed him (but be careful not to overfeed him)\n!play to play with him and make him happy\n!graveyard to see dead jerrys")
+    }
+    if(command == "graveyard"){
+        const graveyard = fs.readFileSync('./graveyard.json')
+        graveyard.forEach(grave => {
+            msg.channel.send(grave)
+            return
+        });
+        msg.channel.send("empty")
     }
 
 })

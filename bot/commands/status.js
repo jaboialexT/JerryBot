@@ -15,10 +15,6 @@ module.exports = {
     name:'status',
     description:"Sends status of discord pet",
     execute(message,args,health,hunger,happiness,lastFed,lastPlayed,userLastFed,userLastPlayed,timeAlive,generation){
-        message.channel.send("Jerry "+romanize(generation)+".\n")
-        message.channel.send('health: '+health+"/10\nhunger: "+hunger+"/10\nhappiness: "+happiness+"/10")
-        message.channel.send("I was last fed by <@"+userLastFed+"> "+lastFed+" hours ago.")
-        message.channel.send("I was last played with by <@"+userLastPlayed+"> "+lastPlayed+" hours ago.")
-        message.channel.send("Ive been alive for "+timeAlive+" hours.")
+        message.channel.send("Jerry "+romanize(generation)+".\nhealth: "+health+"/10\nhunger: "+hunger+"/10\nhappiness: "+happiness+"/10\nI was last fed by <@"+userLastFed+"> "+lastFed+" hours ago.\nI was last played with by <@"+userLastPlayed+"> "+lastPlayed+" hours ago.\nIve been alive for "+timeAlive+" hours.")
     }
 }
