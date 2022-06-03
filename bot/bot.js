@@ -1,32 +1,141 @@
 const { Client, Intents } = require('discord.js') // loads in discord.js library
+const Discord = require('discord.js')
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] }) // creates client environment
 const config = require('./configs.json')
+const save = require('./saveData.json')
 const fs = require('fs');
 const brain = require('brain.js');
-const { waitForDebugger } = require('inspector');
+const { DiscordAPIError } = require('discord.js');
+const { execPath } = require('process')
 const network = new brain.recurrent.LSTM({
     activation: 'leaky-relu'
 });
 
+client.commands = new Discord.Collection();
+
+
+const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
+for(const file of commandFiles){
+    const command = require(`./commands/${file}`)
+    client.commands.set(command.name,command)
+}
+
+
+const status = {
+    "health":save.health,
+    "hunger":save.hunger,
+    "happiness":save.happiness,
+    "timeAlive":save.timeAlive, 
+    "timeLastFed":save.timeLastFed,
+    "timeLastPlayed":save.timeLastPlayed,
+    "personLastFed":save.personLastFed,
+    "personLastPlayed":save.personLastPlayed,
+    "generation":save.generation
+}
+
 var token = config.token;
-const channelID = config.channel;
+const channelID = config.testChannel;
 const prefix = config.prefix;
 
+function romanize (num) {
+    if (isNaN(num))
+        return NaN;
+    var digits = String(+num).split(""),
+        key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+               "","I","II","III","IV","V","VI","VII","VIII","IX"],
+        roman = "",
+        i = 3;
+    while (i--)
+        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+    return Array(+digits.join("") + 1).join("M") + roman;
+}
+
+function saveStatusData()
+{
+    try{
+        fs.writeFile('saveData.json',"{\n\"health\":"+status.health
+        +",\n\"hunger\":"+status.hunger
+        +",\n\"happiness\":"+status.happiness
+        +",\n\"timeAlive\":"+status.timeAlive
+        +",\n\"timeLastFed\":"+status.timeLastFed
+        +",\n\"timeLastPlayed\":"+status.timeLastPlayed
+        +",\n\"personLastFed\":\""+status.personLastFed
+        +"\",\n\"personLastPlayed\":\""+status.personLastPlayed
+        +"\",\n\"generation\":"+status.generation+"\n}"
+        ,(err,result)=>{
+            if(err) console.log("Error: "+err);
+        });
+    }catch(err){
+        console.log(err)
+    }
+}
+function start(){
+    var nextDate = new Date(); // date that counts every hour
+    //send dead jerry to graveyard 
+    if(status.generation>1){
+        try{
+            fs.appendFile("graveyard.json","Jerry "+romanize(status.generation)+" lived for "+status.timeAlive+" hours\n",(err,result)=>{
+                if(err) console.log("Error: "+err)
+            })
+        }catch(err){
+            console.log(err)
+        }
+    }
+    //create new jerry
+    status.hunger = 10;
+    status.happiness =10;
+    status.timeAlive = 0;
+    status.timeLastFed = 0;
+    status.timeLastPlayed =0;
+    status.personLastFed = null;
+    status.personLastPlayed = null;
+    saveStatusData();
+    if (nextDate.getMinutes() === 0) {
+        callEveryHour()
+    } else {
+        nextDate.setHours(nextDate.getHours() + 1);
+        nextDate.setMinutes(0);
+        nextDate.setSeconds(0);
+
+        var difference = nextDate - new Date();
+        setTimeout(callEveryHour, difference);
+    }
+}
+function callEveryHour(){
+    setInterval(update(),1000*60*60);
+}
+function update() {
+    status.timeAlive++;
+    status.timeLastFed++;
+    status.timeLastPlayed++;
+    hunger--;
+    happiness--;
+    if(!hunger>5) happiness--;
+    if(hunger<=0){
+        hunger = 0;
+        health--;
+    }   
+    if(hunger==10 && happiness ==10 && health!=10) health++;
+    if(health==0) {
+        status.generation++;
+        start();
+    }
+    saveStatusData();
+}
 client.on("ready",()=>{
     network.fromJSON(JSON.parse(fs.readFileSync('neuralnet.json','utf8')))
     console.log(`logged in as ${client.user.tag}!`)
     client.channels.fetch(channelID).then(channel => {
-        channel.send(":smiley_cat: ");
-        channel.send("good morning! i am up! feel free to talk to me");
+        channel.send(":smiley_cat:\ngood morning! i am up! feel free to talk to me");
     });
 })
-
 
 client.on("message",msg=>{
     if(msg.content=="!sleep"&&msg.channel.id==="979130836857258007"){
         client.channels.fetch(channelID).then(channel => {
-            channel.send(":yawning_face:");
-            channel.send("yawnnnnn time for me to sleep");
+            channel.send(":yawning_face:\nyawnnnnn time for me to sleep");
+            saveStatusData();
             setTimeout(function(){
                 process.exit();
             },2000)
@@ -34,14 +143,50 @@ client.on("message",msg=>{
         return;
     }
     if(msg.content =="") return
-    if(!msg.author.bot && msg.channel.id ===channelID){
+    if(msg.author.bot) return
+    if(!msg.author.bot && msg.channel.id ===channelID && !msg.content.startsWith(prefix)){
         var words = msg.content;
-
         var sentence = words.replace(/[^a-zA-Z]+/g,"").toLowerCase();
-
         msg.channel.send(reply(network.run(sentence)));
     }
-    
+    const args = msg.content.slice(prefix.length).split(/ +/);
+    const command = args.shift().toLowerCase();
+    if(command =='status'){
+        client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
+    }
+    if(command == 'play'){
+        status.personLastPlayed = msg.author.id
+        status.timeLastPlayed = 0;
+        status.happiness = 10;
+        client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
+        saveStatusData();
+    }
+    if(command =='feed'){
+        status.personLastFed = msg.author.id;
+        status.timeLastFed =0;
+        if(status.hunger<10){
+            status.hunger = 10
+        }
+        else{
+            status.health --;
+            status.happiness--;
+            msg.channel.send("Jerry ate too much and isnt feeling so good")
+        }
+        client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
+        saveStatusData();
+    }
+    if(command == "help"){
+        msg.channel.send("!status to check up on how jerrys doing\n!feed to feed him (but be careful not to overfeed him)\n!play to play with him and make him happy\n!graveyard to see dead jerrys")
+    }
+    if(command == "graveyard"){
+        const graveyard = fs.readFileSync('./graveyard.json')
+        graveyard.forEach(grave => {
+            msg.channel.send(grave)
+            return
+        });
+        msg.channel.send("empty")
+    }
+
 })
 
 client.login(token)
@@ -132,3 +277,5 @@ const reply = (intent) =>{
     str+= terms[Math.floor(Math.random()*terms.length)]+" ";
     return str;
 }
+
+start();
