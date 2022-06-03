@@ -1,11 +1,11 @@
 {
-"health":10,
+"health":9,
 "hunger":10,
 "happiness":10,
 "timeAlive":0,
 "timeLastFed":0,
 "timeLastPlayed":0,
 "personLastFed":"null",
-"personLastPlayed":"null",
+"personLastPlayed":"327508081816764416",
 "generation":1
 }

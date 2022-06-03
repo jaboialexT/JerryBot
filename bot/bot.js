@@ -34,7 +34,7 @@ const status = {
 }
 
 var token = config.token;
-const channelID = config.testChannel;
+const channelID = config.channel;
 const prefix = config.prefix;
 
 function romanize (num) {
@@ -81,16 +81,17 @@ function start(){
         }catch(err){
             console.log(err)
         }
+        status.hunger = 10;
+        status.happiness =10;
+        status.timeAlive = 0;
+        status.timeLastFed = 0;
+        status.timeLastPlayed =0;
+        status.personLastFed = null;
+        status.personLastPlayed = null;
+        saveStatusData();
     }
     //create new jerry
-    status.hunger = 10;
-    status.happiness =10;
-    status.timeAlive = 0;
-    status.timeLastFed = 0;
-    status.timeLastPlayed =0;
-    status.personLastFed = null;
-    status.personLastPlayed = null;
-    saveStatusData();
+    
     if (nextDate.getMinutes() === 0) {
         callEveryHour()
     } else {
@@ -109,6 +110,7 @@ function update() {
     status.timeAlive++;
     status.timeLastFed++;
     status.timeLastPlayed++;
+    if(hunger==10 && happiness ==10 && health!=10) health++;
     hunger--;
     happiness--;
     if(!hunger>5) happiness--;
@@ -116,7 +118,6 @@ function update() {
         hunger = 0;
         health--;
     }   
-    if(hunger==10 && happiness ==10 && health!=10) health++;
     if(health==0) {
         status.generation++;
         start();
@@ -127,7 +128,7 @@ client.on("ready",()=>{
     network.fromJSON(JSON.parse(fs.readFileSync('neuralnet.json','utf8')))
     console.log(`logged in as ${client.user.tag}!`)
     client.channels.fetch(channelID).then(channel => {
-        channel.send(":smiley_cat:\ngood morning! i am up! feel free to talk to me");
+        //channel.send(":smiley_cat:\ngood morning! i am up! feel free to talk to me");
     });
 })
 
@@ -147,7 +148,7 @@ client.on("message",msg=>{
     if(!msg.author.bot && msg.channel.id ===channelID && !msg.content.startsWith(prefix)){
         var words = msg.content;
         var sentence = words.replace(/[^a-zA-Z]+/g,"").toLowerCase();
-        msg.channel.send(reply(network.run(sentence)));
+        //msg.channel.send(reply(network.run(sentence)));
     }
     const args = msg.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
@@ -198,7 +199,7 @@ var sad_reply=["im sorry you feel that way","i hope you feel better"]
 var opinion_reply=["i hate them","i love them","theyre mid"]
 var negative_reply=["thats not a nice thing to say","thats a little mean"]
 
-const reply = (intent) =>{
+/*const reply = (intent) =>{
     if(intent ==="") return ":thinking:";
     
     var retstr = "";
@@ -276,6 +277,6 @@ const reply = (intent) =>{
     }
     str+= terms[Math.floor(Math.random()*terms.length)]+" ";
     return str;
-}
+}*/
 
 start();
