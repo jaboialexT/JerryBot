@@ -1,0 +1,13 @@
+feedGifs:
+* 1 too full
+* 2 what do you wanna eat
+* 3 skewers
+moodGifs:
+* 1 jerry misses you
+* 2 jerry loves you
+* 3 where are you
+* 4 goodnight
+playGifs:
+* 1 snowman
+* 2 dance
+* 3 listen to music
