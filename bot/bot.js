@@ -94,9 +94,9 @@ function romanize (num) {
         setInterval(update,1000*60*60);
     }
     function die(){
-        newEmbed.setImage(String(moodGif[3]))
-        newEmbed.setDescription("Jerry "+romanize(status.generation)+" was too neglected and died")
         client.channels.fetch(channelID).then(channel => {
+            newEmbed.setImage(String(moodGif[3]));
+            newEmbed.setDescription("Jerry "+romanize(status.generation)+" was too neglected and died");
             channel.send({embeds:[newEmbed]});
         });
 
@@ -110,7 +110,7 @@ function romanize (num) {
         status.generation++;
         status.hunger = 10;
         status.health = 10;
-        status.happiness =10;
+        status.happiness = 10;
         status.timeAlive = 0;
         status.timeLastFed = 0;
         status.timeLastPlayed =0;
@@ -119,20 +119,8 @@ function romanize (num) {
         saveStatusData();
     }
     
-    function start(){
-        var nextDate = new Date(); // date that counts every hour
     
-        if (nextDate.getMinutes() === 0) {
-            callEveryHour()
-        } else {
-            nextDate.setHours(nextDate.getHours() + 1);
-            nextDate.setMinutes(0);
-            nextDate.setSeconds(0);
-            
-            var difference = nextDate - new Date();
-            setTimeout(callEveryHour, difference);
-        }
-    }
+    
     function update() {
         status.timeAlive++;
         status.timeLastFed++;
@@ -145,18 +133,17 @@ function romanize (num) {
             status.hunger = 0;
             status.health--;
         }   
-        if(status.health==0) {
+        if(status.happiness<=0){
+            status.happiness = 0;
+        }
+        if(status.health<=0) {
             die();
-    }
+        }
     saveStatusData();
-    start();
 }
 client.on("ready",()=>{
     network.fromJSON(JSON.parse(fs.readFileSync('neuralnet.json','utf8')))
     console.log(`logged in as ${client.user.tag}!`)
-    client.channels.fetch(channelID).then(channel => {
-        channel.send(":smiley_cat:\ngood morning! i am up! feel free to talk to me");
-    });
 })
 
 client.on("message",msg=>{
@@ -179,63 +166,72 @@ client.on("message",msg=>{
     }
     const args = msg.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
-    if(command =='status'){
-        if(status.happiness===10){
-            newEmbed.setImage(String(moodGif[1]))
-            newEmbed.setDescription(String(moodDesc[1]))
+    if(!msg.author.bot && msg.channel.id ===channelID){
+
+        if(command =='status'){
+            if(status.happiness===10){
+                newEmbed.setImage(String(moodGif[1]))
+                newEmbed.setDescription(String(moodDesc[1]))
+            }
+            else if(status.happiness>5){
+                newEmbed.setImage(String(moodGif[0]))
+                newEmbed.setDescription(String(moodDesc[0]))
+            }
+            else {
+                newEmbed.setImage(String(moodGif[2]))
+                newEmbed.setDescription(String(moodDesc[2]))
+            }
+            msg.channel.send({embeds:[newEmbed]})
+            client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
         }
-        else if(status.happiness>5){
-            newEmbed.setImage(String(moodGif[0]))
-            newEmbed.setDescription(String(moodDesc[0]))
-        }
-        else {
-            newEmbed.setImage(String(moodGif[2]))
-            newEmbed.setDescription(String(moodDesc[2]))
-        }
-        msg.channel.send({embeds:[newEmbed]})
-        client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
-    }
-    if(command == 'play'){
-        const playGifPick = Math.floor(Math.random()*3)
-        
-        status.personLastPlayed = msg.author.id
-        status.timeLastPlayed = 0;
-        status.happiness = 10;
-        newEmbed.setDescription(String(playDesc[playGifPick]))
-        newEmbed.setImage(String(playGifs[playGifPick]))
-        msg.channel.send({embeds:[newEmbed]})
-        client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
-        saveStatusData();
-    }
-    if(command =='feed'){
-        const feedGifPick = (Math.random() <= 0.5) ? 1 : 2
-        status.personLastFed = msg.author.id;
-        status.timeLastFed =0;
-        if(status.hunger<10){
-            status.hunger = 10
-            newEmbed.setImage(String(feedGif[feedGifPick]))
-            newEmbed.setDescription(String(feedDesc[feedGifPick]))
+        if(command == 'play'){
+            const playGifPick = Math.floor(Math.random()*3)
             
+            status.personLastPlayed = msg.author.id
+            status.timeLastPlayed = 0;
+            status.happiness = 10;
+            newEmbed.setDescription(String(playDesc[playGifPick]))
+            newEmbed.setImage(String(playGifs[playGifPick]))
+            msg.channel.send({embeds:[newEmbed]})
+            client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
+            saveStatusData();
         }
-        else{
-            status.health --;
-            status.happiness--;
-            newEmbed.setImage(String(feedGif[0]))
-            newEmbed.setDescription(String(feedDesc[0]))
+        if(command =='feed'){
+            const feedGifPick = (Math.random() <= 0.5) ? 1 : 2
+            status.personLastFed = msg.author.id;
+            status.timeLastFed =0;
+            if(status.hunger<10){
+                status.hunger = 10
+                newEmbed.setImage(String(feedGif[feedGifPick]))
+                newEmbed.setDescription(String(feedDesc[feedGifPick]))
+                
+            }
+            else{
+                status.health --;
+                status.happiness--;
+                newEmbed.setImage(String(feedGif[0]))
+                newEmbed.setDescription(String(feedDesc[0]))
+                if(status.happiness<=0){
+                    status.happiness = 0;
+                }
+                if(status.hunger<=0){
+                    die();
+                }
+            }
+            msg.channel.send({embeds:[newEmbed]})
+            client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
+            saveStatusData();
         }
-        msg.channel.send({embeds:[newEmbed]})
-        client.commands.get('status').execute(msg,args,status.health,status.hunger,status.happiness,status.timeLastFed,status.timeLastPlayed,status.personLastFed,status.personLastPlayed,status.timeAlive,status.generation)
-        saveStatusData();
+        if(command == "help"){
+            msg.channel.send("!status to check up on how jerrys doing\n!feed to feed him (but be careful not to overfeed him)\n!play to play with him and make him happy\n!graveyard to see dead jerrys")
+        }
+        if(command == "graveyard"){
+            const graveyard = fs.readFileSync('./graveyard.txt')
+            if(graveyard.length!=0){
+                msg.channel.send(String(graveyard))
+            }
+            else msg.channel.send("empty")
     }
-    if(command == "help"){
-        msg.channel.send("!status to check up on how jerrys doing\n!feed to feed him (but be careful not to overfeed him)\n!play to play with him and make him happy\n!graveyard to see dead jerrys")
-    }
-    if(command == "graveyard"){
-        const graveyard = fs.readFileSync('./graveyard.txt')
-        if(graveyard.length!=0){
-            msg.channel.send(String(graveyard))
-        }
-        else msg.channel.send("empty")
     }
     
 })
@@ -249,6 +245,20 @@ var sad_reply=["im sorry you feel that way","i hope you feel better"]
 var opinion_reply=["i hate them","i love them","theyre mid"]
 var negative_reply=["thats not a nice thing to say","thats a little mean"]
 
+var nextDate = new Date(); // date that counts every hour
+
+
+
+if (nextDate.getMinutes() === 0) {
+    callEveryHour()
+} else {
+    nextDate.setHours(nextDate.getHours() + 1);
+    nextDate.setMinutes(0);
+    nextDate.setSeconds(0);
+    
+    var difference = nextDate - new Date();
+    setTimeout(callEveryHour, difference);
+}
 /*const reply = (intent) =>{
     if(intent ==="") return ":thinking:";
     
@@ -273,7 +283,7 @@ var negative_reply=["thats not a nice thing to say","thats a little mean"]
                         case 6:
                             retstr = greeting();
                             break;
-            case 7:
+                            case 7:
                 retstr = negative_reply[Math.floor(Math.random()*negative_reply.length)]
                 break;
                             default:
@@ -328,5 +338,3 @@ var negative_reply=["thats not a nice thing to say","thats a little mean"]
     str+= terms[Math.floor(Math.random()*terms.length)]+" ";
     return str;
 }*/
-
-start();
