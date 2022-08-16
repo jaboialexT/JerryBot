@@ -1,10 +1,5 @@
-happiness check - > 0-10 happiness bar that decays by 1 every hour but decays by 2 when hunger is below 5
-happiness decays by 1 when jerry is overfed
-health check -> 0-10 health bar decays by 1 every hour when hunger is at 0, health is restored by 1 per hour when hunger and health
-is full
+Sentiment Analysis Bot (Nickname Jerry)
 
-hunger check - > 0-10 hunger bar that decays every hour
+Utilizes Brain.js library to train a neural network to determine sentiment of messages sent to the bot
 
-status check - > effects how jerry talks, status is determined by happiness health and hunger
-status[happy = happiness 10,sad = happiness is less than 5,angry = happiness is 0,sick = health <5,hungry = hunger<5,dead = health =0]
-happy  sad and angry only apply if hunger and health are greater than 5, i.e. sick hungry and dead take presedence
+Features tamagotchi like mechanics (use certain commands to take care of the bot)
